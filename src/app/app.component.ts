@@ -13,6 +13,7 @@ import { Observable, Subject, of } from "rxjs"
 import { HttpClient, HttpParams } from "@angular/common/http"
 import { debounceTime, distinctUntilChanged, switchMap, tap } from "rxjs/operators"
 
+import { HCC_LABELS, HCC_GRAPH } from "./data/hccs_v22"
 class IcdCode {
   code: string
   description: string
@@ -32,6 +33,8 @@ export class AppComponent {
 
   selectedDiagnoses: string[] = []
   filteredDiagnoses: Observable<string[]>
+  hcc_labels = HCC_LABELS
+  hcc_graph = HCC_GRAPH
 
   rafScore$: any
 

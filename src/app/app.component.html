@@ -36,9 +36,9 @@
         <div *ngIf="d.is_billable; else notBillable">
           <small class="icd-subheader"
             >Billable
-            <span *ngIf="d.hccs.length > 0" class="hccs"
-              >hcc(s): {{ d.hccs }}</span
-            ></small
+            <span class="hccs" *ngFor="let hcc of d.hccs"
+              >HCC{{ hcc }}: {{ hcc_labels[hcc] }}
+            </span></small
           >
         </div>
         <ng-template #notBillable
