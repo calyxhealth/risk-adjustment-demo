@@ -107,4 +107,10 @@
     </li>
   </ul>
 </div>
+<div *ngIf="(hcc_to_icd_list$ | async) as hccicd">
+  <details *ngFor="let hcc of hcc_list">
+    <summary>{{ hcc }}: {{ hcc_labels[hcc] }}</summary>
+    <div *ngFor="let code of hccicd[hcc]">{{ code }}</div>
+  </details>
+</div>
 <router-outlet></router-outlet>

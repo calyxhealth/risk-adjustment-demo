@@ -35,6 +35,8 @@ export class AppComponent {
 
   hcc_labels = HCC_LABELS
   hcc_graph = HCC_GRAPH
+  hcc_list: string[] = Object.keys(HCC_LABELS)
+  hcc_to_icd_list$: any
 
   rafScore$: any
 
@@ -47,6 +49,8 @@ export class AppComponent {
   constructor(private http: HttpClient, private _formBuilder: FormBuilder) {}
 
   ngOnInit(): void {
+    this.hcc_to_icd_list$ = this.http.get("./assets/hcc_to_icd_2018.json")
+
     this.rafScoreForm = this._formBuilder.group({
       diagnoses: [""],
       age: ["70", Validators.required],
