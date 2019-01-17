@@ -73,7 +73,7 @@ export class AppComponent {
         this.rafScore$ = this.http
           .get(this.url + "risk_adjust", {
             params: new HttpParams()
-              .set("diagnoses", this.selectedDiagnoses.map(d => d.split(":")).join())
+              .set("diagnoses", this.selectedDiagnoses.map(d => d.split(":")[0]).join())
               .set("sex", form.sex)
               .set("age", form.age)
               .set("model", form.model),
