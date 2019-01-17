@@ -108,9 +108,18 @@
   </ul>
 </div>
 <div *ngIf="(hcc_to_icd_list$ | async) as hccicd">
-  <details *ngFor="let hcc of hcc_list">
-    <summary>{{ hcc }}: {{ hcc_labels[hcc] }}</summary>
-    <div *ngFor="let code of hccicd[hcc]">{{ code }}</div>
-  </details>
+  <mat-expansion-panel *ngFor="let hcc of hcc_list">
+    <mat-expansion-panel-header>
+      HCC{{ hcc }}: {{ hcc_labels[hcc] }}
+    </mat-expansion-panel-header>
+
+    <ng-template matExpansionPanelContent>
+      <div *ngIf="code_map">
+        <div *ngFor="let code of hccicd[hcc]">
+          {{ code }}: {{ code_map[code].long_description }}
+        </div>
+      </div>
+    </ng-template>
+  </mat-expansion-panel>
 </div>
 <router-outlet></router-outlet>

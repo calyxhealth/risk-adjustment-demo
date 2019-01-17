@@ -12,6 +12,7 @@ import {
 import { Observable, Subject, of } from "rxjs"
 import { HttpClient, HttpParams } from "@angular/common/http"
 import { debounceTime, distinctUntilChanged, switchMap, tap } from "rxjs/operators"
+import * as lunr from "lunr"
 
 import { HCC_LABELS, HCC_GRAPH } from "./data/hccs_v22"
 class IcdCode {
@@ -37,6 +38,8 @@ export class AppComponent {
   hcc_graph = HCC_GRAPH
   hcc_list: string[] = Object.keys(HCC_LABELS)
   hcc_to_icd_list$: any
+  lunr_index: lunr.Index
+  code_map: any
 
   rafScore$: any
 
@@ -50,6 +53,12 @@ export class AppComponent {
 
   ngOnInit(): void {
     this.hcc_to_icd_list$ = this.http.get("./assets/hcc_to_icd_2018.json")
+    this.http.get("./assets/icd_codes_index_2018.json").subscribe(data => {
+      this.lunr_index = lunr.Index.load(data)
+    })
+    this.http.get("./assets/icd_codes_map_2018.json").subscribe(data => {
+      this.code_map = data
+    })
 
     this.rafScoreForm = this._formBuilder.group({
       diagnoses: [""],
