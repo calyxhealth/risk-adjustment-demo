@@ -56,7 +56,7 @@ export class AppComponent {
       distinctUntilChanged(),
       switchMap((term: string) =>
         this.http.get<IcdCode[]>(this.url + "icd_10_codes", {
-          params: { query: term },
+          params: new HttpParams().set("query", term).set("ignore_case", "true"),
         })
       )
     )
