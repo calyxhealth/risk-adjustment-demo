@@ -1,5 +1,9 @@
 <div [formGroup]="rafScoreForm">
-  <mat-form-field class="example-chip-list" appearance="outline">
+  <mat-form-field
+    class="example-chip-list"
+    appearance="outline"
+    [floatLabel]="'always'"
+  >
     <mat-label>ICD-10 codes</mat-label>
     <mat-chip-list #chipList>
       <mat-chip
