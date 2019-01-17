@@ -70,10 +70,35 @@ export class AppComponent {
     this.icdCodes$ = this.searchTerms.pipe(
       debounceTime(300),
       distinctUntilChanged(),
-      switchMap((term: string) =>
-        this.http.get<IcdCode[]>(this.url + "icd_10_codes", {
-          params: new HttpParams().set("query", term).set("ignore_case", "true"),
-        })
+      switchMap(
+        (term: string) => {
+          let queryterms = term
+            .trim()
+            .split(" ")
+            .filter(s => Boolean(s.trim()) && s.trim().length > 2)
+            .map(s => "+" + s.trim() + "*")
+            .join(" ")
+          console.log(queryterms)
+          return of(
+            this.lunr_index
+              .search(queryterms)
+              .map(match => {
+                let code = match.ref
+                let codedetails = this.code_map[code]
+                let obj = {
+                  code: code,
+                  description: codedetails.long_description,
+                  is_billable: codedetails.is_valid,
+                  hccs: codedetails.hccs,
+                }
+                return obj
+              })
+              .sort((a, b) => a.code.localeCompare(b.code))
+          )
+        }
+        // this.http.get<IcdCode[]>(this.url + "icd_10_codes", {
+        //   params: new HttpParams().set("query", term).set("ignore_case", "true"),
+        // })
       )
     )
 
@@ -97,7 +122,9 @@ export class AppComponent {
   }
 
   search(term: string): void {
-    this.searchTerms.next(term)
+    if (term.trim().length > 2) {
+      this.searchTerms.next(term)
+    }
   }
 
   add(event: MatChipInputEvent): void {
