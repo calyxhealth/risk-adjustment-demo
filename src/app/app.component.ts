@@ -32,7 +32,7 @@ export class AppComponent {
   icdCodes$: Observable<IcdCode[]>
 
   selectedDiagnoses: string[] = []
-  filteredDiagnoses: Observable<string[]>
+
   hcc_labels = HCC_LABELS
   hcc_graph = HCC_GRAPH
 
