@@ -33,7 +33,8 @@
               "./external-css/socicon.css",
               "./external-css/bootstrap.css",
               "./external-css/theme-charcoal.css",
-              "./external-css/custom.css"
+              "./external-css/custom.css",
+              "./ng-select-css/bootstrap.theme.scss"
             ],
             "scripts": [
               "./external-js/jquery-3.1.1.min.js",
@@ -100,7 +101,8 @@
               "./external-css/socicon.css",
               "./external-css/bootstrap.css",
               "./external-css/theme-charcoal.css",
-              "./external-css/custom.css"
+              "./external-css/custom.css",
+              "./ng-select-css/bootstrap.theme.scss"
             ],
             "scripts": [
               "./external-js/jquery-3.1.1.min.js",
