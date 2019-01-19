@@ -132,7 +132,10 @@
                   [disabled]="d.is_billable === false"
                 >
                   <div>{{ d.code }}: {{ d.description }}</div>
-                  <div *ngIf="d.is_billable; else notBillable">
+                  <div
+                    class="diagnosis-option-subheader"
+                    *ngIf="d.is_billable; else notBillable"
+                  >
                     <small class="icd-subheader"
                       >Billable
                       <span class="hccs" *ngFor="let hcc of d.hccs"
@@ -196,7 +199,7 @@
             class="boxed boxed--border boxed--lg box-shadow scorebox"
             *ngIf="selectedDiagnoses.length && (rafScore$ | async) as rafScore"
           >
-            <h2>Raf Score: {{ rafScore.total }}</h2>
+            <h2>RAF Score: {{ rafScore.total }}</h2>
             <div *ngIf="rafScore.demographic_components.length">
               Demographic Components:
             </div>

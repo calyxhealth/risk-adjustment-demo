@@ -68,7 +68,7 @@ export class AppComponent {
     })
 
     this.icdCodes$ = this.searchTerms.pipe(
-      debounceTime(300),
+      debounceTime(20),
       distinctUntilChanged(),
       switchMap(
         (term: string) => {
