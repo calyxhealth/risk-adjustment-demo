@@ -73,7 +73,6 @@ export class AppComponent {
       switchMap(
         (term: string) => {
           let queryterms = term
-            .trim()
             .split(" ")
             .filter(s => Boolean(s.trim()) && s.trim().length > 2)
             .map(s => "+" + s.trim() + "*")
@@ -122,8 +121,9 @@ export class AppComponent {
   }
 
   search(term: string): void {
-    if (term.trim().length > 2) {
-      this.searchTerms.next(term)
+    let normalized_term = term.trim().replace(/\./g, "")
+    if (normalized_term.length > 2) {
+      this.searchTerms.next(normalized_term)
     }
   }
 
