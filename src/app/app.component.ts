@@ -89,7 +89,7 @@ export class AppComponent {
                 response[3].map(
                   pair =>
                     <IcdCode>{
-                      code: pair[0].replace(/\./g, ""),
+                      code: pair[0],
                       description: pair[1],
                       is_billable: this.code_map[pair[0].replace(/\./g, "")][
                         "is_valid"
@@ -115,7 +115,12 @@ export class AppComponent {
         this.rafScore$ = this.http
           .get(this.url + "risk_adjust", {
             params: new HttpParams()
-              .set("diagnoses", this.selectedDiagnoses.map(d => d.split(":")[0]).join())
+              .set(
+                "diagnoses",
+                this.selectedDiagnoses
+                  .map(d => d.split(":")[0].replace(/\./g, ""))
+                  .join()
+              )
               .set("sex", form.sex)
               .set("age", form.age)
               .set("model", form.model),
@@ -126,7 +131,7 @@ export class AppComponent {
   }
 
   search(term: string): void {
-    let normalized_term = term.trim().replace(/\./g, "")
+    let normalized_term = term.trim()
     if (normalized_term.length > 2) {
       this.searchTerms.next(normalized_term)
     }
