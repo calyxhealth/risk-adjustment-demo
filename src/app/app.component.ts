@@ -11,8 +11,7 @@ import {
 } from "@angular/material"
 import { Observable, Subject, of } from "rxjs"
 import { HttpClient, HttpParams } from "@angular/common/http"
-import { debounceTime, distinctUntilChanged, switchMap, tap } from "rxjs/operators"
-import * as lunr from "lunr"
+import { debounceTime, distinctUntilChanged, switchMap, tap, map } from "rxjs/operators"
 
 import { HCC_LABELS, HCC_GRAPH } from "./data/hccs_v22"
 class IcdCode {
@@ -38,7 +37,6 @@ export class AppComponent {
   hcc_graph = HCC_GRAPH
   hcc_list: string[] = Object.keys(HCC_LABELS)
   hcc_to_icd_list$: any
-  lunr_index: lunr.Index
   code_map: any
 
   rafScore$: any
@@ -48,14 +46,12 @@ export class AppComponent {
 
   rafScoreForm: FormGroup
   url = "https://7dw0imxsfi.execute-api.us-west-2.amazonaws.com/api/"
+  icd_url = "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search"
 
   constructor(private http: HttpClient, private _formBuilder: FormBuilder) {}
 
   ngOnInit(): void {
     this.hcc_to_icd_list$ = this.http.get("./assets/hcc_to_icd_2018.json")
-    this.http.get("./assets/icd_codes_index_2018.json").subscribe(data => {
-      this.lunr_index = lunr.Index.load(data)
-    })
     this.http.get("./assets/icd_codes_map_2018.json").subscribe(data => {
       this.code_map = data
     })
@@ -68,37 +64,38 @@ export class AppComponent {
     })
 
     this.icdCodes$ = this.searchTerms.pipe(
-      debounceTime(50),
+      debounceTime(100),
       distinctUntilChanged(),
-      switchMap(
-        (term: string) => {
-          let queryterms = term
-            .split(" ")
-            .filter(s => Boolean(s.trim()) && s.trim().length > 2)
-            .map(s => "+" + s.trim() + "*")
-            .join(" ")
-          console.log(queryterms)
-          return of(
-            this.lunr_index
-              .search(queryterms)
-              .map(match => {
-                let code = match.ref
-                let codedetails = this.code_map[code]
-                let obj = {
-                  code: code,
-                  description: codedetails.long_description,
-                  is_billable: codedetails.is_valid,
-                  hccs: codedetails.hccs,
-                }
-                return obj
-              })
-              .sort((a, b) => a.code.localeCompare(b.code))
+      switchMap((term: string) => {
+        let queryterms = term
+          .split(" ")
+          .filter(s => Boolean(s.trim()))
+          .join(",")
+        return this.http
+          .get(this.icd_url, {
+            params: new HttpParams()
+              .set("terms", queryterms)
+              .set("maxList", "250")
+              .set("sf", "code,name")
+              .set("df", "code,name"),
+          })
+          .pipe(
+            map(response =>
+              response[3].map(
+                pair =>
+                  <IcdCode>{
+                    code: pair[0].replace(/\./g, ""),
+                    description: pair[1],
+                    is_billable: this.code_map[pair[0].replace(/\./g, "")]["is_valid"],
+                    hccs: this.code_map[pair[0].replace(/\./g, "")]["hccs"],
+                  }
+              )
+            )
           )
-        }
-        // this.http.get<IcdCode[]>(this.url + "icd_10_codes", {
-        //   params: new HttpParams().set("query", term).set("ignore_case", "true"),
-        // })
-      )
+      })
+      // this.http.get<IcdCode[]>(this.url + "icd_10_codes", {
+      //   params: new HttpParams().set("query", term).set("ignore_case", "true"),
+      // })
     )
 
     this.rafScoreForm.valueChanges
