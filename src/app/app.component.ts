@@ -67,7 +67,15 @@ export class AppComponent {
       debounceTime(100),
       distinctUntilChanged(),
       switchMap((term: string) => {
-        let queryterms = term.split(" ").filter(s => Boolean(s.trim()))
+        let queryterms = term
+          .split(" ")
+          .filter(s => Boolean(s.trim()))
+          .map(s =>
+            // For ICD-like patterns, insert the period so search matches
+            s.length > 3 && s.match(/^[a-zA-Z][0-9][0-9AB][0-9a-zA-Z]/)
+              ? s.slice(0, 3) + "." + s.slice(3)
+              : s
+          )
         return this.http
           .get(this.icd_url, {
             params: new HttpParams()
