@@ -67,29 +67,37 @@ export class AppComponent {
       debounceTime(100),
       distinctUntilChanged(),
       switchMap((term: string) => {
-        let queryterms = term
-          .split(" ")
-          .filter(s => Boolean(s.trim()))
-          .join(",")
+        let queryterms = term.split(" ").filter(s => Boolean(s.trim()))
         return this.http
           .get(this.icd_url, {
             params: new HttpParams()
-              .set("terms", queryterms)
+              .set("terms", queryterms[0])
+              .set(
+                "q",
+                queryterms
+                  .slice(1)
+                  .map(s => s + "*")
+                  .join(" ")
+              )
               .set("maxList", "250")
               .set("sf", "code,name")
               .set("df", "code,name"),
           })
           .pipe(
-            map(response =>
-              response[3].map(
-                pair =>
-                  <IcdCode>{
-                    code: pair[0].replace(/\./g, ""),
-                    description: pair[1],
-                    is_billable: this.code_map[pair[0].replace(/\./g, "")]["is_valid"],
-                    hccs: this.code_map[pair[0].replace(/\./g, "")]["hccs"],
-                  }
-              )
+            map(
+              response =>
+                response[3].map(
+                  pair =>
+                    <IcdCode>{
+                      code: pair[0].replace(/\./g, ""),
+                      description: pair[1],
+                      is_billable: this.code_map[pair[0].replace(/\./g, "")][
+                        "is_valid"
+                      ],
+                      hccs: this.code_map[pair[0].replace(/\./g, "")]["hccs"],
+                    }
+                )
+              //.sort((a, b) => a.code.localeCompare(b.code))
             )
           )
       })
