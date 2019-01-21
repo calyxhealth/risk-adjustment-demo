@@ -41,6 +41,8 @@ export class AppComponent {
 
   rafScore$: any
 
+  isRafLoading: boolean
+
   @ViewChild("diagnosisInput") diagnosisInput: ElementRef<HTMLInputElement>
   @ViewChild("auto") matAutocomplete: MatAutocomplete
 
@@ -117,7 +119,10 @@ export class AppComponent {
     this.rafScoreForm.valueChanges
       .pipe(
         debounceTime(300),
-        distinctUntilChanged()
+        distinctUntilChanged(),
+        tap(() => {
+          this.isRafLoading = true
+        })
       )
       .subscribe(form => {
         this.rafScore$ = this.http
@@ -133,7 +138,12 @@ export class AppComponent {
               .set("age", form.age)
               .set("model", form.model),
           })
-          .pipe(tap(x => console.log(x)))
+          .pipe(
+            tap(x => {
+              console.log(x)
+              this.isRafLoading = false
+            })
+          )
         //.subscribe(response => console.log(response))
       })
   }
