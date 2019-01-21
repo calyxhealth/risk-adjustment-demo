@@ -84,172 +84,185 @@
       </div>
     </div>
   </section> -->
-  <section class="switchable switchable--switch">
-    <div class="container">
-      <div class="row justify-content-between">
-        <div
-          class="col-md-9 col-lg-8 boxed boxed--border bg--secondary boxed--lg box-shadow"
-        >
-          <h2>Compute the Risk Adjustment Factor</h2>
-          <div [formGroup]="rafScoreForm">
-            <mat-form-field
-              class="example-chip-list"
-              appearance="outline"
-              [floatLabel]="'always'"
-            >
-              <mat-label>ICD-10 codes</mat-label>
-              <mat-chip-list #chipList>
-                <mat-chip
-                  *ngFor="let diagnosis of selectedDiagnoses"
-                  [selectable]="true"
-                  [removable]="true"
-                  (removed)="remove(diagnosis)"
-                >
-                  {{ diagnosis }}
-                  <mat-icon matChipRemove>cancel</mat-icon>
-                </mat-chip>
-                <input
-                  matInput
-                  placeholder="Search for a diagnosis..."
-                  #diagnosisInput
-                  id="searchbox"
-                  [matAutocomplete]="auto"
-                  [matChipInputFor]="chipList"
-                  [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                  [matChipInputAddOnBlur]="true"
-                  (matChipInputTokenEnd)="add($event)"
-                  (input)="search(diagnosisInput.value)"
-                />
-              </mat-chip-list>
-              <mat-autocomplete
-                #auto="matAutocomplete"
-                (optionSelected)="selected($event)"
+  <div class="container">
+    <mat-tab-group mat-stretch-tabs>
+      <mat-tab label="RAF Calculation">
+        <section class="switchable switchable--switch">
+          <div class="container">
+            <div class="row justify-content-between">
+              <div
+                class="col-md-9 col-lg-8 boxed boxed--border bg--secondary boxed--lg box-shadow"
               >
-                <mat-option
-                  class="diagnosis-option"
-                  *ngFor="let d of (icdCodes$ | async)"
-                  [value]="d.code + ': ' + d.description"
-                  [disabled]="d.is_billable === false"
-                >
-                  <div>{{ d.code }}: {{ d.description }}</div>
-                  <div
-                    class="diagnosis-option-subheader"
-                    *ngIf="d.is_billable; else notBillable"
+                <h2>Compute the Risk Adjustment Factor</h2>
+                <div [formGroup]="rafScoreForm">
+                  <mat-form-field
+                    class="example-chip-list"
+                    appearance="outline"
+                    [floatLabel]="'always'"
                   >
-                    <small class="icd-subheader"
-                      >Billable
-                      <span class="hccs" *ngFor="let hcc of d.hccs"
-                        >HCC{{ hcc }}: {{ hcc_labels[hcc] }}
-                      </span></small
+                    <mat-label>ICD-10 codes</mat-label>
+                    <mat-chip-list #chipList>
+                      <mat-chip
+                        *ngFor="let diagnosis of selectedDiagnoses"
+                        [selectable]="true"
+                        [removable]="true"
+                        (removed)="remove(diagnosis)"
+                      >
+                        {{ diagnosis }}
+                        <mat-icon matChipRemove>cancel</mat-icon>
+                      </mat-chip>
+                      <input
+                        matInput
+                        placeholder="Search for a diagnosis..."
+                        #diagnosisInput
+                        id="searchbox"
+                        [matAutocomplete]="auto"
+                        [matChipInputFor]="chipList"
+                        [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                        [matChipInputAddOnBlur]="true"
+                        (matChipInputTokenEnd)="add($event)"
+                        (input)="search(diagnosisInput.value)"
+                      />
+                    </mat-chip-list>
+                    <mat-autocomplete
+                      #auto="matAutocomplete"
+                      (optionSelected)="selected($event)"
                     >
-                  </div>
-                  <ng-template #notBillable
-                    ><small class="icd-subheader">Not billable</small>
-                  </ng-template>
-                </mat-option>
-              </mat-autocomplete>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Age</mat-label>
-              <input
-                matInput
-                type="number"
-                #age
-                maxlength="3"
-                placeholder="Age"
-                formControlName="age"
-              />
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Sex</mat-label>
-              <mat-select formControlName="sex" required>
-                <mat-option [value]="1"> Male </mat-option>
-                <mat-option [value]="2"> Female </mat-option>
-              </mat-select>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Model</mat-label>
-              <mat-select formControlName="model" required>
-                <mat-option [value]="'cna'"> Community Non-Dual Aged </mat-option>
-                <mat-option [value]="'cnd'"> Community Non-Dual Disabled </mat-option>
-                <mat-option [value]="'cfa'">
-                  Community Full Benefit Dual Aged
-                </mat-option>
-                <mat-option [value]="'cfd'">
-                  Community Full Benefit Dual Disabled
-                </mat-option>
-                <mat-option [value]="'cpa'">
-                  Community Partial Benefit Dual Aged
-                </mat-option>
-                <mat-option [value]="'cpd'">
-                  Community Partial Benefit Dual Disabled
-                </mat-option>
-                <mat-option [value]="'ins'"> Long Term Institutional </mat-option>
-                <mat-option [value]="'ne'"> New Enrollees </mat-option>
-                <mat-option [value]="'snpne'">
-                  Special Needs Plan (SNP) New Enrollees
-                </mat-option>
-              </mat-select>
-              <mat-error>Model is required!</mat-error>
-            </mat-form-field>
-          </div>
-        </div>
-        <div class="col-md-3 col-lg-4">
-          <div
-            class="boxed boxed--border boxed--lg box-shadow scorebox"
-            *ngIf="selectedDiagnoses.length && (rafScore$ | async) as rafScore"
-          >
-            <h2>RAF Score: {{ rafScore.total }}</h2>
-            <div *ngIf="rafScore.demographic_components.length">
-              Demographic Components:
-            </div>
-            <ul>
-              <li *ngFor="let c of rafScore.demographic_components">
-                {{ c.description }} : <b>{{ c.score }}</b>
-              </li>
-            </ul>
-            <div *ngIf="rafScore.hcc_components.length">HCC Components:</div>
-            <ul>
-              <li *ngFor="let c of rafScore.hcc_components">
-                {{ c.description }} : <b>{{ c.score }}</b>
-              </li>
-            </ul>
-            <div *ngIf="rafScore.interaction_components.length">
-              Interaction Components:
-            </div>
-            <ul>
-              <li *ngFor="let c of rafScore.interaction_components">
-                {{ c.description }} : <b>{{ c.score }}</b>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <section>
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-md-12" *ngIf="(hcc_to_icd_list$ | async) as hccicd">
-          <h2>Browse the ICD codes leading to each HCC</h2>
-          <hr />
-          <mat-expansion-panel *ngFor="let hcc of hcc_list">
-            <mat-expansion-panel-header>
-              HCC{{ hcc }}: {{ hcc_labels[hcc] }}
-            </mat-expansion-panel-header>
-
-            <ng-template matExpansionPanelContent>
-              <div *ngIf="code_map">
-                <div *ngFor="let code of hccicd[hcc]">
-                  {{ formatICDwithPeriod(code) }}: {{ code_map[code].long_description }}
+                      <mat-option
+                        class="diagnosis-option"
+                        *ngFor="let d of (icdCodes$ | async)"
+                        [value]="d.code + ': ' + d.description"
+                        [disabled]="d.is_billable === false"
+                      >
+                        <div>{{ d.code }}: {{ d.description }}</div>
+                        <div
+                          class="diagnosis-option-subheader"
+                          *ngIf="d.is_billable; else notBillable"
+                        >
+                          <small class="icd-subheader"
+                            >Billable
+                            <span class="hccs" *ngFor="let hcc of d.hccs"
+                              >HCC{{ hcc }}: {{ hcc_labels[hcc] }}
+                            </span></small
+                          >
+                        </div>
+                        <ng-template #notBillable
+                          ><small class="icd-subheader">Not billable</small>
+                        </ng-template>
+                      </mat-option>
+                    </mat-autocomplete>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline">
+                    <mat-label>Age</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      #age
+                      maxlength="3"
+                      placeholder="Age"
+                      formControlName="age"
+                    />
+                  </mat-form-field>
+                  <mat-form-field appearance="outline">
+                    <mat-label>Sex</mat-label>
+                    <mat-select formControlName="sex" required>
+                      <mat-option [value]="1"> Male </mat-option>
+                      <mat-option [value]="2"> Female </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline">
+                    <mat-label>Model</mat-label>
+                    <mat-select formControlName="model" required>
+                      <mat-option [value]="'cna'"> Community Non-Dual Aged </mat-option>
+                      <mat-option [value]="'cnd'">
+                        Community Non-Dual Disabled
+                      </mat-option>
+                      <mat-option [value]="'cfa'">
+                        Community Full Benefit Dual Aged
+                      </mat-option>
+                      <mat-option [value]="'cfd'">
+                        Community Full Benefit Dual Disabled
+                      </mat-option>
+                      <mat-option [value]="'cpa'">
+                        Community Partial Benefit Dual Aged
+                      </mat-option>
+                      <mat-option [value]="'cpd'">
+                        Community Partial Benefit Dual Disabled
+                      </mat-option>
+                      <mat-option [value]="'ins'"> Long Term Institutional </mat-option>
+                      <mat-option [value]="'ne'"> New Enrollees </mat-option>
+                      <mat-option [value]="'snpne'">
+                        Special Needs Plan (SNP) New Enrollees
+                      </mat-option>
+                    </mat-select>
+                    <mat-error>Model is required!</mat-error>
+                  </mat-form-field>
                 </div>
               </div>
-            </ng-template>
-          </mat-expansion-panel>
-        </div>
-      </div>
-    </div>
-  </section>
+              <div class="col-md-3 col-lg-4">
+                <div
+                  class="boxed boxed--border boxed--lg box-shadow scorebox"
+                  *ngIf="selectedDiagnoses.length && (rafScore$ | async) as rafScore"
+                >
+                  <h2>RAF Score: {{ rafScore.total }}</h2>
+                  <div *ngIf="rafScore.demographic_components.length">
+                    Demographic Components:
+                  </div>
+                  <ul>
+                    <li *ngFor="let c of rafScore.demographic_components">
+                      {{ c.description }} : <b>{{ c.score }}</b>
+                    </li>
+                  </ul>
+                  <div *ngIf="rafScore.hcc_components.length">HCC Components:</div>
+                  <ul>
+                    <li *ngFor="let c of rafScore.hcc_components">
+                      {{ c.description }} : <b>{{ c.score }}</b>
+                    </li>
+                  </ul>
+                  <div *ngIf="rafScore.interaction_components.length">
+                    Interaction Components:
+                  </div>
+                  <ul>
+                    <li *ngFor="let c of rafScore.interaction_components">
+                      {{ c.description }} : <b>{{ c.score }}</b>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section></mat-tab
+      >
+      <mat-tab label="ICD Code Mapping"
+        ><section>
+          <div class="container">
+            <div class="row justify-content-center">
+              <div class="col-md-12" *ngIf="(hcc_to_icd_list$ | async) as hccicd">
+                <h2>Browse the ICD codes leading to each HCC</h2>
+                <hr />
+                <mat-expansion-panel *ngFor="let hcc of hcc_list">
+                  <mat-expansion-panel-header>
+                    HCC{{ hcc }}: {{ hcc_labels[hcc] }}
+                  </mat-expansion-panel-header>
+
+                  <ng-template matExpansionPanelContent>
+                    <div *ngIf="code_map">
+                      <div *ngFor="let code of hccicd[hcc]">
+                        {{ formatICDwithPeriod(code) }}:
+                        {{ code_map[code].long_description }}
+                      </div>
+                    </div>
+                  </ng-template>
+                </mat-expansion-panel>
+              </div>
+            </div>
+          </div>
+        </section></mat-tab
+      >
+      <mat-tab label="HCC Hierachy"> </mat-tab>
+      <mat-tab label="Explanation"><section>Lorem Ipsum</section> </mat-tab>
+    </mat-tab-group>
+  </div>
 
   <router-outlet></router-outlet>
 </div>

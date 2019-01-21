@@ -13,6 +13,7 @@ import {
   MatInputModule,
   MatSelectModule,
   MatExpansionModule,
+  MatTabsModule,
 } from "@angular/material"
 import { ReactiveFormsModule } from "@angular/forms"
 import { HttpClientModule } from "@angular/common/http"
@@ -32,6 +33,7 @@ import { HttpClientModule } from "@angular/common/http"
     MatInputModule,
     MatSelectModule,
     MatExpansionModule,
+    MatTabsModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
