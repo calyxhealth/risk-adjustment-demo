@@ -14,6 +14,7 @@ import { HttpClient, HttpParams } from "@angular/common/http"
 import { debounceTime, distinctUntilChanged, switchMap, tap, map } from "rxjs/operators"
 
 import { HCC_LABELS, HCC_GRAPH } from "./data/hccs_v22"
+import * as shape from "d3-shape"
 class IcdCode {
   code: string
   description: string
@@ -50,9 +51,69 @@ export class AppComponent {
   url = "https://7dw0imxsfi.execute-api.us-west-2.amazonaws.com/api/"
   icd_url = "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search"
 
+  curve: any = shape.curveBundle.beta(1)
+
+  view: any[]
+  nodes: any[]
+  links: any[]
+
   constructor(private http: HttpClient, private _formBuilder: FormBuilder) {}
 
   ngOnInit(): void {
+    this.nodes = [
+      {
+        id: "start",
+        label: "start",
+      },
+      {
+        id: "1",
+        label: "Query ThreatConnect",
+      },
+      {
+        id: "2",
+        label: "Query XForce",
+      },
+      {
+        id: "3",
+        label: "Format Results",
+      },
+      {
+        id: "4",
+        label: "Search Splunk",
+      },
+      {
+        id: "5",
+        label: "Block LDAP",
+      },
+      {
+        id: "6",
+        label: "Email Results",
+      },
+    ]
+    this.links = [
+      {
+        source: "start",
+        target: "1",
+        label: "links to",
+      },
+      {
+        source: "start",
+        target: "2",
+      },
+      {
+        source: "1",
+        target: "3",
+        label: "related to",
+      },
+      {
+        source: "2",
+        target: "4",
+      },
+      {
+        source: "5",
+        target: "6",
+      },
+    ]
     this.hcc_to_icd_list$ = this.http.get("./assets/hcc_to_icd_2018.json")
     this.http.get("./assets/icd_codes_map_2018.json").subscribe(data => {
       this.code_map = data

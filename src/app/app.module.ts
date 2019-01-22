@@ -18,12 +18,13 @@ import {
 } from "@angular/material"
 import { ReactiveFormsModule } from "@angular/forms"
 import { HttpClientModule } from "@angular/common/http"
+import { NgxChartsModule } from "@swimlane/ngx-charts"
+import { NgxGraphModule } from "@swimlane/ngx-graph"
 @NgModule({
   declarations: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    BrowserAnimationsModule,
     MatChipsModule,
     MatAutocompleteModule,
     MatIconModule,
@@ -36,6 +37,9 @@ import { HttpClientModule } from "@angular/common/http"
     MatExpansionModule,
     MatTabsModule,
     MatProgressSpinnerModule,
+    NgxGraphModule,
+    NgxChartsModule,
+    BrowserAnimationsModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
