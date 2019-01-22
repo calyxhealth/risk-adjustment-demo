@@ -54,66 +54,30 @@ export class AppComponent {
   curve: any = shape.curveBundle.beta(1)
 
   view: any[]
-  nodes: any[]
-  links: any[]
+  model_v22_nodes: any[]
+  model_v22_links: any[]
 
   constructor(private http: HttpClient, private _formBuilder: FormBuilder) {}
 
   ngOnInit(): void {
-    this.nodes = [
-      {
-        id: "start",
-        label: "start",
-      },
-      {
-        id: "1",
-        label: "Query ThreatConnect",
-      },
-      {
-        id: "2",
-        label: "Query XForce",
-      },
-      {
-        id: "3",
-        label: "Format Results",
-      },
-      {
-        id: "4",
-        label: "Search Splunk",
-      },
-      {
-        id: "5",
-        label: "Block LDAP",
-      },
-      {
-        id: "6",
-        label: "Email Results",
-      },
-    ]
-    this.links = [
-      {
-        source: "start",
-        target: "1",
-        label: "links to",
-      },
-      {
-        source: "start",
-        target: "2",
-      },
-      {
-        source: "1",
-        target: "3",
-        label: "related to",
-      },
-      {
-        source: "2",
-        target: "4",
-      },
-      {
-        source: "5",
-        target: "6",
-      },
-    ]
+    let hccs_in_hierachy = new Set()
+    Object.entries(HCC_GRAPH).forEach(([k, v]) => {
+      hccs_in_hierachy.add(k)
+      v.forEach(parent => {
+        hccs_in_hierachy.add(parent)
+      })
+    })
+    this.model_v22_nodes = Array.from(hccs_in_hierachy).map(k => {
+      return { id: k, label: "HCC " + k + ": " + HCC_LABELS[k] }
+    })
+    this.model_v22_links = []
+    Object.entries(HCC_GRAPH).forEach(([k, parents]) => {
+      this.model_v22_links = this.model_v22_links.concat(
+        parents.map(parent => {
+          return { source: parent, target: k }
+        })
+      )
+    })
     this.hcc_to_icd_list$ = this.http.get("./assets/hcc_to_icd_2018.json")
     this.http.get("./assets/icd_codes_map_2018.json").subscribe(data => {
       this.code_map = data
