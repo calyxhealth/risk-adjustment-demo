@@ -326,13 +326,13 @@
                   <div *ngIf="rafScore.demographic_components.length">
                     Demographic Components:
                   </div>
-                  <ul>
+                  <ul class="bullets">
                     <li *ngFor="let c of rafScore.demographic_components">
                       {{ c.description }} : <b>{{ c.score }}</b>
                     </li>
                   </ul>
                   <div *ngIf="rafScore.hcc_components.length">HCC Components:</div>
-                  <ul>
+                  <ul class="bullets">
                     <li *ngFor="let c of rafScore.hcc_components">
                       {{ c.description }} : <b>{{ c.score }}</b>
                     </li>
@@ -340,7 +340,7 @@
                   <div *ngIf="rafScore.interaction_components.length">
                     Interaction Components:
                   </div>
-                  <ul>
+                  <ul class="bullets">
                     <li *ngFor="let c of rafScore.interaction_components">
                       {{ c.description }} : <b>{{ c.score }}</b>
                     </li>
