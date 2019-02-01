@@ -85,7 +85,118 @@
     </div>
   </section> -->
   <div class="container tab-container">
-    <mat-tab-group mat-stretch-tabs>
+    <mat-tab-group mat-stretch-tabs [selectedIndex]="0">
+      <mat-tab label="About">
+        <section>
+          <h5>Introduction</h5>
+          <p>
+            This site contains an explanation and open-source implementation of the Risk
+            Adjustment model used by the Center for Medicare and Medicaid Services (CMS)
+            to pay Medicare Advantage plans. The full details of the model, along with a
+            software implementation, are published on the
+            <a
+              href="https://www.cms.gov/Medicare/Health-Plans/MedicareAdvtgSpecRateStats/Risk-Adjustors.html"
+              >CMS website</a
+            >. However, the information there can be hard to parse, and the software
+            implementation is written in SAS, a languge which is neither free nor widely
+            used in the software development community.
+          </p>
+
+          <h5>What is Risk Adjustment?</h5>
+
+          <p>
+            To understand Risk Adjustment, you first need to understand the difference
+            between the two flavors of Medicare: Original Medicare, and Medicare
+            Advantage (MA). Patients who are eligible for Medicare (primarily seniors
+            over the age of 65, but also some younger patients with disabilities) can
+            choose between these two options. Both typically involve a monthly premium
+            paid by the patient, after which the government foots the bill for the
+            patient's medical costs (or some percentage thereof).
+          </p>
+          <p>
+            The way the government pays for the two types of Medicare is very different.
+            Original Medicare is administered directly by the government under a "fee
+            for service" model. This means that the government, acting as the insurer,
+            simply pays their portion of whatever service the patient uses. If a patient
+            visits the doctor for a standard office visit, and also gets some lab work
+            done and a flu shot, the government will pay their share for each of those
+            three things (the office visit, the lab test, the flu shot).
+          </p>
+
+          <p>
+            By contrast, Medicare Advantage is administered by private insurance
+            companies such as United, Aetna, etc. Instead of paying for each individual
+            service the patient uses, the government pays the private insurance company
+            a fixed rate per patient per year. By regulation, the private insurer needs
+            to provide certain benefits, but beyond that it's up them to determine how
+            to allocate their resources between primary care, specialists, etc. In
+            principle, this incentivizes payers to keep the overall costs of patient
+            treatment low. Plans that do a better job of keeping patients healthier will
+            have lower overall cost, and can therefore profit from the difference
+            between the fixed amount they're receiving and their expenses.
+          </p>
+          <p>
+            In the early days of Medicare Advantage, payers would make money by cherry
+            picking the healthiest patients with the lowest costs. Although this
+            practice is technically prohibited, payers might get around the restrictions
+            by advertising to the healthiest patients or by only offering their plans in
+            regions with healthier populations. To disincentize this kind of behavior,
+            Risk Adjustment was born.
+            <i>
+              Risk Adjustment is the process of adjusting the amount paid to Medicare
+              Advantage plans based on the health conditions of the patients they
+              insure.
+            </i>
+            By paying insurance companies more to insure sicker patients, they should in
+            principle be incentivized to insure all patients, not just the healthy ones.
+          </p>
+
+          <h5>How is the Risk Adjustment Factor calculated?</h5>
+          <p>
+            For each patient insured by Medicare Advantage, the amount that the
+            government pays to the Medicare Advantage plan depends on the patient's
+            demographics (age and sex) and medical conditions. The relevant medical
+            conditions are divided into categories called Hierarchical Condition
+            Categories (HCC). They are "hierarchical" because some categories represent
+            more severe or specific versions of other categories. For instance, HCC 19
+            is "Diabetes without complications" and HCC 18 is "Diabetes with
+            complications." The latter is a more severe version of the former.
+          </p>
+
+          <p>
+            To determine which HCC categories apply to a patient, Medicare looks at the
+            diagnosis (ICD-10) codes that have been used on the patient's insurance
+            claims throughout the year. For each HCC, there is a set of related ICD
+            codes, and in order to qualify for that HCC, a patient needs at least one of
+            the relevant ICD codes (there is no advantage to having multiple diagnosis
+            codes that imply the same HCC, since the patient either qualifies as having
+            the HCC, or they don't). If a patient qualifies for multiple HCCs that are
+            related in the hierarchy, only the more specific/severe category is used.
+          </p>
+          <p>
+            A final "score" for the patient, also known as the Risk Adjustment Factor or
+            RAF score, is computed by adding a series of numeric coefficients based on
+            the following features:
+          </p>
+
+          <ul class="bullets">
+            <li>The age and sex of the patient</li>
+            <li>
+              The HCCs the patient qualifies for (after filtering to only the most
+              specific/severe ones that apply)
+            </li>
+            <li>Interactions between multiple HCCs</li>
+          </ul>
+          <p>
+            Formally, this is simply a weighted sum of boolean variables, where each
+            variable represesents the presence or absence of a certain condition (the
+            condition may be being in a certain age range, having a certain HCC, or
+            having a certain pair of HCCs).
+          </p>
+          <h5>Where do the different model types mean?</h5>
+          <p>TODO</p>
+        </section>
+      </mat-tab>
       <mat-tab label="RAF Calculator">
         <section class="switchable switchable--switch">
           <div class="container">
@@ -344,7 +455,6 @@
           </section>
         </ng-template>
       </mat-tab>
-      <mat-tab label="FAQ"><section>Lorem Ipsum</section> </mat-tab>
     </mat-tab-group>
   </div>
   <footer class="text-center space--sm footer-5">
