@@ -85,7 +85,11 @@
     </div>
   </section> -->
   <div class="container tab-container">
-    <mat-tab-group mat-stretch-tabs [selectedIndex]="0">
+    <mat-tab-group
+      mat-stretch-tabs
+      [selectedIndex]="activeTab"
+      (selectedIndexChange)="router.navigate(['.'], { fragment: tabLinks[$event] })"
+    >
       <mat-tab label="About">
         <section>
           <h5>Introduction</h5>

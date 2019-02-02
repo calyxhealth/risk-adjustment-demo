@@ -1,6 +1,7 @@
 import { COMMA, ENTER } from "@angular/cdk/keycodes"
 import { Component, ElementRef, ViewChild } from "@angular/core"
 import { FormBuilder, FormGroup, Validators, FormControl } from "@angular/forms"
+import { ActivatedRoute, Router } from "@angular/router"
 
 import {
   MatAutocompleteSelectedEvent,
@@ -57,9 +58,21 @@ export class AppComponent {
   model_v22_nodes: any[]
   model_v22_links: any[]
 
-  constructor(private http: HttpClient, private _formBuilder: FormBuilder) {}
+  private activeTab: number
+  private tabLinks: string[] = ["about", "rafscore", "hccs", "hierarchy"]
+
+  constructor(
+    private http: HttpClient,
+    private _formBuilder: FormBuilder,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
+    this.route.fragment.subscribe(fragment => {
+      this.activeTab = Math.max(0, this.tabLinks.indexOf(fragment))
+    })
+
     let hccs_in_hierachy = new Set()
     Object.entries(HCC_GRAPH).forEach(([k, v]) => {
       hccs_in_hierachy.add(k)
