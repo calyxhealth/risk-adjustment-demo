@@ -114,6 +114,9 @@ export class AppComponent {
     this.icdCodes$ = this.searchTerms.pipe(
       debounceTime(100),
       distinctUntilChanged(),
+      tap(() => {
+        this.isIcdLoading = true
+      }),
       switchMap((term: string) => {
         let queryterms = term
           .split(" ")
@@ -154,7 +157,10 @@ export class AppComponent {
                     }
                 )
               //.sort((a, b) => a.code.localeCompare(b.code))
-            )
+            ),
+            finalize(() => {
+              this.isIcdLoading = false
+            })
           )
       })
       // this.http.get<IcdCode[]>(this.url + "icd_10_codes", {

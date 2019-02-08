@@ -243,6 +243,11 @@
                         (matChipInputTokenEnd)="add($event)"
                         (input)="search(diagnosisInput.value)"
                       />
+                      <mat-spinner
+                        matSuffix
+                        *ngIf="isIcdLoading"
+                        [diameter]="18"
+                      ></mat-spinner>
                     </mat-chip-list>
                     <mat-autocomplete
                       #auto="matAutocomplete"
