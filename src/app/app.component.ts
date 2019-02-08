@@ -12,7 +12,14 @@ import {
 } from "@angular/material"
 import { Observable, Subject, of } from "rxjs"
 import { HttpClient, HttpParams } from "@angular/common/http"
-import { debounceTime, distinctUntilChanged, switchMap, tap, map } from "rxjs/operators"
+import {
+  debounceTime,
+  distinctUntilChanged,
+  switchMap,
+  tap,
+  map,
+  finalize,
+} from "rxjs/operators"
 
 import { HCC_LABELS, HCC_GRAPH } from "./data/hccs_v22"
 import * as shape from "d3-shape"
@@ -41,9 +48,10 @@ export class AppComponent {
   hcc_to_icd_list$: any
   code_map: any
 
-  rafScore$: any
+  rafScore: any = null
 
   isRafLoading: boolean
+  isIcdLoading: boolean
 
   @ViewChild("diagnosisInput") diagnosisInput: ElementRef<HTMLInputElement>
   @ViewChild("auto") matAutocomplete: MatAutocomplete
@@ -163,7 +171,8 @@ export class AppComponent {
         })
       )
       .subscribe(form => {
-        this.rafScore$ = this.http
+        this.isRafLoading = true
+        this.http
           .get(this.url + "risk_adjust", {
             params: new HttpParams()
               .set(
@@ -177,12 +186,13 @@ export class AppComponent {
               .set("model", form.model),
           })
           .pipe(
-            tap(x => {
-              console.log(x)
+            finalize(() => {
               this.isRafLoading = false
             })
           )
-        //.subscribe(response => console.log(response))
+          .subscribe(response => {
+            this.rafScore = response
+          })
       })
   }
 

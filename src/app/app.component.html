@@ -329,7 +329,7 @@
 
                 <div
                   class="boxed boxed--border boxed--lg box-shadow scorebox"
-                  *ngIf="selectedDiagnoses.length && (rafScore$ | async) as rafScore"
+                  *ngIf="rafScore !== null"
                 >
                   <h2>RAF Score: {{ rafScore.total }}</h2>
                   <div *ngIf="rafScore.demographic_components.length">
