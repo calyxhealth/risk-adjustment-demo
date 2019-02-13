@@ -55,6 +55,7 @@ export class AppComponent {
   selected_hcc_list: string[]
   hcc_list_model_year: string = "2018"
 
+  hcc_labels = HCC_LABELS_V22 //default labels for RAF calculator
   hcc_labels_v22: any
   hcc_list_v22: string[]
   hcc_labels_v23: any
