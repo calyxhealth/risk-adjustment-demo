@@ -21,7 +21,16 @@ import {
   finalize,
 } from "rxjs/operators"
 
-import { HCC_LABELS, HCC_GRAPH } from "./data/hccs_v22"
+import {
+  HCC_LABELS as HCC_LABELS_V22,
+  HCC_GRAPH as HCC_GRAPH_V22,
+} from "./data/hccs_v22"
+
+import {
+  HCC_LABELS as HCC_LABELS_V23,
+  HCC_GRAPH as HCC_GRAPH_V23,
+} from "./data/hccs_v23"
+
 import * as shape from "d3-shape"
 class IcdCode {
   code: string
@@ -42,9 +51,15 @@ export class AppComponent {
 
   selectedDiagnoses: string[] = []
 
-  hcc_labels = HCC_LABELS
-  hcc_graph = HCC_GRAPH
-  hcc_list: string[] = Object.keys(HCC_LABELS)
+  selected_hcc_labels: any
+  selected_hcc_list: string[]
+  hcc_list_model_year: string = "2018"
+
+  hcc_labels_v22: any
+  hcc_list_v22: string[]
+  hcc_labels_v23: any
+  hcc_list_v23: string[]
+
   hcc_to_icd_list$: any
   code_map: any
 
@@ -65,6 +80,8 @@ export class AppComponent {
   view: any[]
   model_v22_nodes: any[]
   model_v22_links: any[]
+  model_v23_nodes: any[]
+  model_v23_links: any[]
 
   private activeTab: number
   private tabLinks: string[] = ["about", "rafscore", "hccs", "hierarchy"]
@@ -76,30 +93,59 @@ export class AppComponent {
     private route: ActivatedRoute
   ) {}
 
+  setModelYear(year: string) {
+    this.selected_hcc_labels = year === "2019" ? HCC_LABELS_V23 : HCC_LABELS_V22
+    this.selected_hcc_list = Object.keys(this.selected_hcc_labels)
+    this.hcc_to_icd_list$ = this.http.get(`./assets/hcc_to_icd_${year}.json`)
+  }
+
   ngOnInit(): void {
     this.route.fragment.subscribe(fragment => {
       this.activeTab = Math.max(0, this.tabLinks.indexOf(fragment))
     })
 
+    this.setModelYear("2018")
+
+    // ---- init v22 graph ----
     let hccs_in_hierachy = new Set()
-    Object.entries(HCC_GRAPH).forEach(([k, v]) => {
+    Object.entries(HCC_GRAPH_V22).forEach(([k, v]) => {
       hccs_in_hierachy.add(k)
       v.forEach(parent => {
         hccs_in_hierachy.add(parent)
       })
     })
     this.model_v22_nodes = Array.from(hccs_in_hierachy).map(k => {
-      return { id: k, label: "HCC " + k + ": " + HCC_LABELS[k] }
+      return { id: k, label: "HCC " + k + ": " + HCC_LABELS_V22[k] }
     })
     this.model_v22_links = []
-    Object.entries(HCC_GRAPH).forEach(([k, parents]) => {
+    Object.entries(HCC_GRAPH_V22).forEach(([k, parents]) => {
       this.model_v22_links = this.model_v22_links.concat(
         parents.map(parent => {
           return { source: parent, target: k }
         })
       )
     })
-    this.hcc_to_icd_list$ = this.http.get("./assets/hcc_to_icd_2018.json")
+
+    // ---- init v23 graph ----
+    hccs_in_hierachy = new Set()
+    Object.entries(HCC_GRAPH_V23).forEach(([k, v]) => {
+      hccs_in_hierachy.add(k)
+      v.forEach(parent => {
+        hccs_in_hierachy.add(parent)
+      })
+    })
+    this.model_v23_nodes = Array.from(hccs_in_hierachy).map(k => {
+      return { id: k, label: "HCC " + k + ": " + HCC_LABELS_V23[k] }
+    })
+    this.model_v23_links = []
+    Object.entries(HCC_GRAPH_V23).forEach(([k, parents]) => {
+      this.model_v23_links = this.model_v23_links.concat(
+        parents.map(parent => {
+          return { source: parent, target: k }
+        })
+      )
+    })
+
     this.http.get("./assets/icd_codes_map_2018.json").subscribe(data => {
       this.code_map = data
     })

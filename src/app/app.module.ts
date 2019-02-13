@@ -16,7 +16,7 @@ import {
   MatTabsModule,
   MatProgressSpinnerModule,
 } from "@angular/material"
-import { ReactiveFormsModule } from "@angular/forms"
+import { ReactiveFormsModule, FormsModule } from "@angular/forms"
 import { HttpClientModule } from "@angular/common/http"
 import { NgxChartsModule } from "@swimlane/ngx-charts"
 import { NgxGraphModule } from "@swimlane/ngx-graph"
@@ -30,6 +30,7 @@ import { NgxGraphModule } from "@swimlane/ngx-graph"
     MatIconModule,
     MatFormFieldModule,
     ReactiveFormsModule,
+    FormsModule,
     HttpClientModule,
     MatRadioModule,
     MatInputModule,
