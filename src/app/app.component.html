@@ -264,8 +264,7 @@
                           class="diagnosis-option-subheader"
                           *ngIf="d.is_billable; else notBillable"
                         >
-                          <small class="icd-subheader"
-                            >Billable
+                          <small class="icd-subheader">
                             <span class="hccs" *ngFor="let hcc of d.hccs"
                               >HCC{{ hcc }}: {{ hcc_labels[hcc] }}
                             </span></small
