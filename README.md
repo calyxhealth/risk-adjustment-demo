@@ -18,6 +18,13 @@ Run `ng generate component component-name` to generate a new component. You can 
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
 
+## Deploy to Github Pages
+There's a bug with the graphing library used for the DAG, so until it's fixed we can't compile in 'prod' mode. Instead use the following:
+```
+ng build --prod --aot=false --build-optimizer=false --base-href "https://calyxhealth.github.io/risk-adjustment-demo/"
+npx ngh --dir=dist/risk-adjustment-demo
+```
+
 ## Running unit tests
 
 Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
