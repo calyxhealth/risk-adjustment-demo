@@ -53,9 +53,9 @@ export class AppComponent {
 
   selected_hcc_labels: any
   selected_hcc_list: string[]
-  hcc_list_model_year: string = "2018"
+  hcc_list_model_year: string = "2019"
 
-  hcc_labels = HCC_LABELS_V22 //default labels for RAF calculator
+  hcc_labels = HCC_LABELS_V23 //default labels for RAF calculator
   hcc_labels_v22: any
   hcc_list_v22: string[]
   hcc_labels_v23: any
@@ -147,7 +147,7 @@ export class AppComponent {
       )
     })
 
-    this.http.get("./assets/icd_codes_map_2018.json").subscribe(data => {
+    this.http.get("./assets/icd_codes_map_2019.json").subscribe(data => {
       this.code_map = data
     })
 
