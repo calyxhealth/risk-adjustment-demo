@@ -197,10 +197,12 @@ export class AppComponent {
                     <IcdCode>{
                       code: pair[0],
                       description: pair[1],
-                      is_billable: this.code_map[pair[0].replace(/\./g, "")][
-                        "is_valid"
-                      ],
-                      hccs: this.code_map[pair[0].replace(/\./g, "")]["hccs"],
+                      is_billable: this.code_map[pair[0].replace(/\./g, "")]
+                        ? this.code_map[pair[0].replace(/\./g, "")].is_valid
+                        : true,
+                      hccs: this.code_map[pair[0].replace(/\./g, "")]
+                        ? this.code_map[pair[0].replace(/\./g, "")].hccs
+                        : [],
                     }
                 )
               //.sort((a, b) => a.code.localeCompare(b.code))
