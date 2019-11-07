@@ -255,7 +255,7 @@
                     >
                       <mat-option
                         class="diagnosis-option"
-                        *ngFor="let d of (icdCodes$ | async)"
+                        *ngFor="let d of icdCodes$ | async"
                         [value]="d.code + ': ' + d.description"
                         [disabled]="d.is_billable === false"
                       >
@@ -368,7 +368,7 @@
         ><section>
           <div class="container">
             <div class="row justify-content-center">
-              <div class="col-md-12" *ngIf="(hcc_to_icd_list$ | async) as hccicd">
+              <div class="col-md-12" *ngIf="hcc_to_icd_list$ | async as hccicd">
                 <h2>Browse the ICD codes leading to each HCC</h2>
 
                 <mat-form-field appearance="outline" [floatLabel]="'always'">
@@ -379,6 +379,7 @@
                   >
                     <mat-option [value]="'2018'">2018</mat-option>
                     <mat-option [value]="'2019'">2019</mat-option>
+                    <mat-option [value]="'2020'">2020</mat-option>
                   </mat-select>
                 </mat-form-field>
 
@@ -531,15 +532,63 @@
                         stroke-width="2"
                         marker-end="url(#arrow)"
                       ></svg:path>
-                      <!-- <svg:text class="edge-label" text-anchor="middle">
-                                            <textPath
-                                              style="fill: #666;"
-                                              [attr.href]="'#' + link.id"
-                                              startOffset="60%"
-                                            >
-                                              {{ link.label }}
-                                            </textPath>
-                                          </svg:text> -->
+                    </svg:g>
+                  </ng-template>
+                </ngx-graph>
+              </div>
+
+              <h3>Model Version 24 (2020)</h3>
+              <div class="container-graph">
+                <ngx-graph
+                  [links]="model_v24_links"
+                  [view]="view"
+                  [nodes]="model_v24_nodes"
+                  [curve]="curve"
+                  [draggingEnabled]="false"
+                  [orientation]="'TB'"
+                  [autoZoom]="true"
+                  [autoCenter]="true"
+                  [enableZoom]="true"
+                  [panOnZoom]="true"
+                >
+                  <ng-template #defsTemplate>
+                    <svg:marker
+                      id="arrow"
+                      viewBox="0 -5 10 10"
+                      refX="8"
+                      refY="0"
+                      markerWidth="4"
+                      markerHeight="4"
+                      orient="auto"
+                    >
+                      <svg:path d="M0,-5L10,0L0,5" class="arrow-head" />
+                    </svg:marker>
+                  </ng-template>
+
+                  <ng-template #nodeTemplate let-node>
+                    <svg:g class="node">
+                      <svg:rect
+                        [attr.width]="node.width"
+                        [attr.height]="node.height"
+                        [attr.fill]="node.options.color"
+                      />
+                      <svg:text
+                        alignment-baseline="central"
+                        [attr.x]="10"
+                        [attr.y]="node.height / 2"
+                      >
+                        {{ node.label }}
+                      </svg:text>
+                    </svg:g>
+                  </ng-template>
+
+                  <ng-template #linkTemplate let-link>
+                    <svg:g class="edge">
+                      <svg:path
+                        class="line"
+                        stroke-width="2"
+                        marker-end="url(#arrow)"
+                      ></svg:path>
                     </svg:g>
                   </ng-template>
                 </ngx-graph>

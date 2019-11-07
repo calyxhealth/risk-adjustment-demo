@@ -31,6 +31,11 @@ import {
   HCC_GRAPH as HCC_GRAPH_V23,
 } from "./data/hccs_v23"
 
+import {
+  HCC_LABELS as HCC_LABELS_V24,
+  HCC_GRAPH as HCC_GRAPH_V24,
+} from "./data/hccs_v24"
+
 import * as shape from "d3-shape"
 class IcdCode {
   code: string
@@ -60,6 +65,8 @@ export class AppComponent {
   hcc_list_v22: string[]
   hcc_labels_v23: any
   hcc_list_v23: string[]
+  hcc_labels_v24: any
+  hcc_list_v24: string[]
 
   hcc_to_icd_list$: any
   code_map: any
@@ -83,6 +90,8 @@ export class AppComponent {
   model_v22_links: any[]
   model_v23_nodes: any[]
   model_v23_links: any[]
+  model_v24_nodes: any[]
+  model_v24_links: any[]
 
   private activeTab: number
   private tabLinks: string[] = ["about", "rafscore", "hccs", "hierarchy"]
@@ -95,7 +104,19 @@ export class AppComponent {
   ) {}
 
   setModelYear(year: string) {
-    this.selected_hcc_labels = year === "2019" ? HCC_LABELS_V23 : HCC_LABELS_V22
+    switch (year) {
+      case "2018":
+        this.selected_hcc_labels = HCC_LABELS_V22
+        break
+      case "2019":
+        this.selected_hcc_labels = HCC_LABELS_V23
+        break
+      case "2020":
+        this.selected_hcc_labels = HCC_LABELS_V24
+        break
+      default:
+        break
+    }
     this.selected_hcc_list = Object.keys(this.selected_hcc_labels)
     this.hcc_to_icd_list$ = this.http.get(`./assets/hcc_to_icd_${year}.json`)
   }
@@ -105,7 +126,7 @@ export class AppComponent {
       this.activeTab = Math.max(0, this.tabLinks.indexOf(fragment))
     })
 
-    this.setModelYear("2018")
+    this.setModelYear("2020")
 
     // ---- init v22 graph ----
     let hccs_in_hierachy = new Set()
@@ -141,6 +162,26 @@ export class AppComponent {
     this.model_v23_links = []
     Object.entries(HCC_GRAPH_V23).forEach(([k, parents]) => {
       this.model_v23_links = this.model_v23_links.concat(
+        parents.map(parent => {
+          return { source: parent, target: k }
+        })
+      )
+    })
+
+    // ---- init v24 graph ----
+    hccs_in_hierachy = new Set()
+    Object.entries(HCC_GRAPH_V24).forEach(([k, v]) => {
+      hccs_in_hierachy.add(k)
+      v.forEach(parent => {
+        hccs_in_hierachy.add(parent)
+      })
+    })
+    this.model_v24_nodes = Array.from(hccs_in_hierachy).map(k => {
+      return { id: k, label: "HCC " + k + ": " + HCC_LABELS_V24[k] }
+    })
+    this.model_v24_links = []
+    Object.entries(HCC_GRAPH_V24).forEach(([k, parents]) => {
+      this.model_v24_links = this.model_v24_links.concat(
         parents.map(parent => {
           return { source: parent, target: k }
         })
