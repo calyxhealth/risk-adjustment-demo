@@ -10,7 +10,7 @@ import {
   MatRadioButton,
   MatRadioGroup,
 } from "@angular/material"
-import { Observable, Subject, of } from "rxjs"
+import { Observable, Subject, of, from } from "rxjs"
 import { HttpClient, HttpParams } from "@angular/common/http"
 import {
   debounceTime,
@@ -37,18 +37,49 @@ import {
 } from "./data/hccs_v24"
 
 import * as shape from "d3-shape"
+import * as ElasticAppSearch from "@elastic/app-search-javascript"
+
 class IcdCode {
   code: string
   description: string
   hccs: number[]
   is_billable: Boolean
 }
+
+export interface ResultList {
+  rawResults: any[]
+  rawInfo: { meta: any }
+  results: ResultItem[]
+  info: {
+    meta: {
+      request_id: string
+      alerts: any[]
+      warnings: any[]
+      page: {
+        current: number
+        total_pages: number
+        total_results: number
+        size: number
+      }
+    }
+    facets?: any
+  }
+}
+
+export interface ResultItem {
+  getRaw(fieldName): any
+  getSnippet(fieldName)
+  data: any
+}
+
 @Component({
   selector: "app-root",
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.less"],
 })
 export class AppComponent {
+  client: any
+
   separatorKeysCodes: number[] = [ENTER, COMMA]
 
   searchTerms = new Subject<string>()
@@ -81,7 +112,6 @@ export class AppComponent {
 
   rafScoreForm: FormGroup
   url = "https://7dw0imxsfi.execute-api.us-west-2.amazonaws.com/api/"
-  icd_url = "https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search"
 
   curve: any = shape.curveBundle.beta(1)
 
@@ -101,7 +131,13 @@ export class AppComponent {
     private _formBuilder: FormBuilder,
     private router: Router,
     private route: ActivatedRoute
-  ) {}
+  ) {
+    this.client = ElasticAppSearch.createClient({
+      hostIdentifier: "host-wahqtd",
+      searchKey: "search-eve6otkfjqhat8ty7r49bdd4",
+      engineName: "icd10-search-engine",
+    })
+  }
 
   setModelYear(year: string) {
     switch (year) {
@@ -206,56 +242,38 @@ export class AppComponent {
         this.isIcdLoading = true
       }),
       switchMap((term: string) => {
-        let queryterms = term
-          .split(" ")
-          .filter(s => Boolean(s.trim()))
-          .map(s =>
-            // For ICD-like patterns, insert the period so search matches
-            s.match(/^[a-zA-Z][0-9][0-9AB][0-9a-zA-Z]/)
-              ? this.formatICDwithPeriod(s)
-              : s
-          )
-        return this.http
-          .get(this.icd_url, {
-            params: new HttpParams()
-              .set("terms", queryterms[0])
-              .set(
-                "q",
-                queryterms
-                  .slice(1)
-                  .map(s => s + "*")
-                  .join(" ")
-              )
-              .set("maxList", "250")
-              .set("sf", "code,name")
-              .set("df", "code,name"),
+        const options = {
+          result_fields: {
+            id: { raw: {} },
+            code: { raw: {} },
+            long_description: { raw: {} },
+            is_billable: { raw: {} },
+            hccs: { raw: {} },
+          },
+          page: {
+            size: 50,
+          },
+        }
+        const elasticResponse$ = from(this.client.search(term, options)) as Observable<
+          ResultList
+        >
+        return elasticResponse$.pipe(
+          map(response =>
+            response.results.map(
+              i =>
+                <IcdCode>{
+                  code: i.getRaw("code"),
+                  description: i.getRaw("long_description"),
+                  is_billable: i.getRaw("is_billable"),
+                  hccs: i.getRaw("hccs"),
+                }
+            )
+          ),
+          finalize(() => {
+            this.isIcdLoading = false
           })
-          .pipe(
-            map(
-              response =>
-                response[3].map(
-                  pair =>
-                    <IcdCode>{
-                      code: pair[0],
-                      description: pair[1],
-                      is_billable: this.code_map[pair[0].replace(/\./g, "")]
-                        ? this.code_map[pair[0].replace(/\./g, "")].is_valid
-                        : true,
-                      hccs: this.code_map[pair[0].replace(/\./g, "")]
-                        ? this.code_map[pair[0].replace(/\./g, "")].hccs
-                        : [],
-                    }
-                )
-              //.sort((a, b) => a.code.localeCompare(b.code))
-            ),
-            finalize(() => {
-              this.isIcdLoading = false
-            })
-          )
+        )
       })
-      // this.http.get<IcdCode[]>(this.url + "icd_10_codes", {
-      //   params: new HttpParams().set("query", term).set("ignore_case", "true"),
-      // })
     )
 
     this.rafScoreForm.valueChanges
