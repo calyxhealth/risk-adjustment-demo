@@ -111,7 +111,7 @@ export class AppComponent {
   @ViewChild("auto") matAutocomplete: MatAutocomplete
 
   rafScoreForm: FormGroup
-  url = "https://7dw0imxsfi.execute-api.us-west-2.amazonaws.com/api/"
+  url = "https://zklnm80487.execute-api.us-west-2.amazonaws.com/api/"
 
   curve: any = shape.curveBundle.beta(1)
 
@@ -158,7 +158,7 @@ export class AppComponent {
   }
 
   ngOnInit(): void {
-    this.route.fragment.subscribe(fragment => {
+    this.route.fragment.subscribe((fragment) => {
       this.activeTab = Math.max(0, this.tabLinks.indexOf(fragment))
     })
 
@@ -168,17 +168,17 @@ export class AppComponent {
     let hccs_in_hierachy = new Set()
     Object.entries(HCC_GRAPH_V22).forEach(([k, v]) => {
       hccs_in_hierachy.add(k)
-      v.forEach(parent => {
+      v.forEach((parent) => {
         hccs_in_hierachy.add(parent)
       })
     })
-    this.model_v22_nodes = Array.from(hccs_in_hierachy).map(k => {
+    this.model_v22_nodes = Array.from(hccs_in_hierachy).map((k) => {
       return { id: k, label: "HCC " + k + ": " + HCC_LABELS_V22[k] }
     })
     this.model_v22_links = []
     Object.entries(HCC_GRAPH_V22).forEach(([k, parents]) => {
       this.model_v22_links = this.model_v22_links.concat(
-        parents.map(parent => {
+        parents.map((parent) => {
           return { source: parent, target: k }
         })
       )
@@ -188,17 +188,17 @@ export class AppComponent {
     hccs_in_hierachy = new Set()
     Object.entries(HCC_GRAPH_V23).forEach(([k, v]) => {
       hccs_in_hierachy.add(k)
-      v.forEach(parent => {
+      v.forEach((parent) => {
         hccs_in_hierachy.add(parent)
       })
     })
-    this.model_v23_nodes = Array.from(hccs_in_hierachy).map(k => {
+    this.model_v23_nodes = Array.from(hccs_in_hierachy).map((k) => {
       return { id: k, label: "HCC " + k + ": " + HCC_LABELS_V23[k] }
     })
     this.model_v23_links = []
     Object.entries(HCC_GRAPH_V23).forEach(([k, parents]) => {
       this.model_v23_links = this.model_v23_links.concat(
-        parents.map(parent => {
+        parents.map((parent) => {
           return { source: parent, target: k }
         })
       )
@@ -208,23 +208,23 @@ export class AppComponent {
     hccs_in_hierachy = new Set()
     Object.entries(HCC_GRAPH_V24).forEach(([k, v]) => {
       hccs_in_hierachy.add(k)
-      v.forEach(parent => {
+      v.forEach((parent) => {
         hccs_in_hierachy.add(parent)
       })
     })
-    this.model_v24_nodes = Array.from(hccs_in_hierachy).map(k => {
+    this.model_v24_nodes = Array.from(hccs_in_hierachy).map((k) => {
       return { id: k, label: "HCC " + k + ": " + HCC_LABELS_V24[k] }
     })
     this.model_v24_links = []
     Object.entries(HCC_GRAPH_V24).forEach(([k, parents]) => {
       this.model_v24_links = this.model_v24_links.concat(
-        parents.map(parent => {
+        parents.map((parent) => {
           return { source: parent, target: k }
         })
       )
     })
 
-    this.http.get("./assets/icd_codes_map_2019.json").subscribe(data => {
+    this.http.get("./assets/icd_codes_map_2019.json").subscribe((data) => {
       this.code_map = data
     })
 
@@ -258,9 +258,9 @@ export class AppComponent {
           ResultList
         >
         return elasticResponse$.pipe(
-          map(response =>
+          map((response) =>
             response.results.map(
-              i =>
+              (i) =>
                 <IcdCode>{
                   code: i.getRaw("code"),
                   description: i.getRaw("long_description"),
@@ -284,7 +284,7 @@ export class AppComponent {
           this.isRafLoading = true
         })
       )
-      .subscribe(form => {
+      .subscribe((form) => {
         this.isRafLoading = true
         this.http
           .get(this.url + "risk_adjust", {
@@ -292,7 +292,7 @@ export class AppComponent {
               .set(
                 "diagnoses",
                 this.selectedDiagnoses
-                  .map(d => d.split(":")[0].replace(/\./g, ""))
+                  .map((d) => d.split(":")[0].replace(/\./g, ""))
                   .join()
               )
               .set("sex", form.sex)
@@ -304,7 +304,7 @@ export class AppComponent {
               this.isRafLoading = false
             })
           )
-          .subscribe(response => {
+          .subscribe((response) => {
             this.rafScore = response
           })
       })
