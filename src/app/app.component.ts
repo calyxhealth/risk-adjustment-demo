@@ -123,13 +123,13 @@ export class AppComponent {
   model_v24_nodes: any[]
   model_v24_links: any[]
 
-  private activeTab: number
-  private tabLinks: string[] = ["about", "rafscore", "hccs", "hierarchy"]
+  public activeTab: number
+  public tabLinks: string[] = ["about", "rafscore", "hccs", "hierarchy"]
 
   constructor(
     private http: HttpClient,
     private _formBuilder: FormBuilder,
-    private router: Router,
+    public router: Router,
     private route: ActivatedRoute
   ) {
     this.client = ElasticAppSearch.createClient({
